@@ -1,23 +1,27 @@
 // define globals
 var weekly_quakes_endpoint = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson";
-var $quakesList;
+var data;
 var map;
-var template;
 var coords = [];
 var latcoord;
 var loncoord;
 var marker;
-
-
-	function initMap() {
-		var mapDiv = document.getElementById('map');
-	    map = new google.maps.Map(mapDiv, {
-	      center: {lat: 37.78, lng: -122.44},
-	      zoom: 8
-	    });
+var icons = {
+	quake: {
+		icon: "earthquake.png"
 	}
+}
 
-$(document).on("ready", function() {
+
+function initMap() {
+	var mapDiv = document.getElementById('map');
+    map = new google.maps.Map(mapDiv, {
+      center: {lat: 37.78, lng: -122.44},
+      zoom: 2
+    });
+}
+
+$(document).on("ready", function(event) {
 
 	$.ajax({
 		method: "GET",
@@ -27,8 +31,17 @@ $(document).on("ready", function() {
 	});
 
 	function onSuccess(json){
-		var data = json.features;
+		data = json.features;
 
+		genMarker();
+
+		var source=$('#earthquake-template').html();
+		var template=Handlebars.compile(source);
+		var earthquakeHtml = template({features: data});
+		$("#info").append(earthquakeHtml);
+	}
+
+	function genMarker() {
 		for (var i = 0; i < data.length; i++) {
 			var loncoord = data[i].geometry.coordinates[0];
 			var latcoord = data[i].geometry.coordinates[1];
@@ -36,29 +49,19 @@ $(document).on("ready", function() {
 			coords = {lat: latcoord, lng: loncoord};
 
 			marker = new google.maps.Marker({
-			position: coords,
-			map: map,
-			title: "Earthquake"
+				position: coords,
+				map: map,
+				title: "Earthquake",
+				icon: icons.quake.icon
 			});
 
-			}
-	
-			console.log(coords);
-
-		var source=$('#earthquake-template').html();
-		 
-
-		//compile:
-		var template=Handlebars.compile(source);
-		console.log(template);
-
-		var earthquakeHtml = template({features: data});
-		console.log(earthquakeHtml);
-		
-		$("#info").append(earthquakeHtml);
+		}
 	}
 
-
+	marker.addListener('click', function() {
+   	map.panTo(marker.getPosition());
+		console.log("clicked");
+	});
 
 
 });
