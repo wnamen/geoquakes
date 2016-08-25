@@ -6,6 +6,7 @@ var coords = [];
 var latcoord;
 var loncoord;
 var marker;
+var markers = [];
 var icons = {
 	quake: {
 		icon: "earthquake.png"
@@ -17,7 +18,28 @@ function initMap() {
 	var mapDiv = document.getElementById('map');
     map = new google.maps.Map(mapDiv, {
       center: {lat: 37.78, lng: -122.44},
-      zoom: 2
+      zoom: 2,
+			styles: [
+            {
+              featureType: 'all',
+              stylers: [
+                { saturation: -80 }
+              ]
+            },{
+              featureType: 'road.arterial',
+              elementType: 'geometry',
+              stylers: [
+                { hue: '#00ffee' },
+                { saturation: 50 }
+              ]
+            },{
+              featureType: 'poi.business',
+              elementType: 'labels',
+              stylers: [
+                { visibility: 'off' }
+              ]
+            }
+          ]
     });
 }
 
@@ -55,13 +77,15 @@ $(document).on("ready", function(event) {
 				icon: icons.quake.icon
 			});
 
+			markers.push(marker);
+
 		}
 	}
 
-	marker.addListener('click', function() {
-   	map.panTo(marker.getPosition());
-		console.log("clicked");
-	});
+	// marker.addListener('click', function() {
+  //  	map.panTo(marker.getPosition());
+	// 	console.log("clicked");
+	// });
 
 
 });
